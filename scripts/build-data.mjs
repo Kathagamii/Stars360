@@ -167,11 +167,70 @@ const outDeepSky = [
     }),
 ];
 
+// ---- Satellites ----
+// A curated, hand-picked set of well-known satellites (see
+// src/data/satelliteFacts.ts for their descriptions). Orbital elements
+// (TLE) come straight from CelesTrak and are propagated live with SGP4
+// at runtime (src/astronomy/satellites.ts) — nothing about their position
+// is precomputed or hard-coded here, only *which* real object each `key`
+// points at.
+function parseTLEFile(text) {
+  const lines = text.split(/\r?\n/).filter((l) => l.length > 0);
+  const sats = [];
+  for (let i = 0; i + 2 < lines.length; i += 3) {
+    const name = lines[i].trim();
+    const line1 = lines[i + 1];
+    const line2 = lines[i + 2];
+    if (!line1.startsWith("1 ") || !line2.startsWith("2 ")) continue;
+    sats.push({ name, line1, line2 });
+  }
+  return sats;
+}
+
+function tleEpochToISO(line1) {
+  const yy = parseInt(line1.substring(18, 20), 10);
+  const dayOfYear = parseFloat(line1.substring(20, 32));
+  const year = yy < 57 ? 2000 + yy : 1900 + yy;
+  return new Date(Date.UTC(year, 0, 1) + (dayOfYear - 1) * 86400000).toISOString();
+}
+
+const CURATED_SATELLITES = [
+  { key: "iss", file: "sat-stations.tle", match: (n) => n === "ISS (ZARYA)" },
+  { key: "css", file: "sat-stations.tle", match: (n) => n === "CSS (TIANHE)" },
+  { key: "hst", file: "sat-science.tle", match: (n) => n === "HST" },
+  { key: "gps", file: "sat-gps-ops.tle", match: (n) => n.startsWith("GPS ") },
+  { key: "geo", file: "sat-geo.tle", match: (n) => n === "GOES 16" },
+  { key: "noaa", file: "sat-weather.tle", match: (n) => n === "NOAA 20 (JPSS-1)" },
+  { key: "landsat", file: "sat-resource.tle", match: (n) => n === "LANDSAT 8" },
+  { key: "sentinel", file: "sat-resource.tle", match: (n) => n === "SENTINEL-2A" },
+  { key: "oneweb", file: "sat-oneweb.tle", match: (n) => n.startsWith("ONEWEB-") },
+];
+
+const outSatellites = [];
+for (const c of CURATED_SATELLITES) {
+  const sats = parseTLEFile(readFileSync(path.join(dp, c.file), "utf-8"));
+  const found = sats.find((s) => c.match(s.name));
+  if (!found) {
+    console.warn(`WARNING: curated satellite "${c.key}" not found in ${c.file} — skipping`);
+    continue;
+  }
+  outSatellites.push({
+    key: c.key,
+    noradId: found.line1.substring(2, 7).trim(),
+    name: found.name,
+    line1: found.line1,
+    line2: found.line2,
+    epoch: tleEpochToISO(found.line1),
+  });
+}
+
 writeFileSync(path.join(out, "stars.json"), JSON.stringify(outStars));
 writeFileSync(path.join(out, "constellations.json"), JSON.stringify(outConstellations));
 writeFileSync(path.join(out, "deepsky.json"), JSON.stringify(outDeepSky));
+writeFileSync(path.join(out, "satellites.json"), JSON.stringify(outSatellites));
 
 console.log("stars:", outStars.length);
 console.log("constellations:", outConstellations.length);
 console.log("deepsky:", outDeepSky.length);
 console.log("named stars:", outStars.filter((s) => s.name).length);
+console.log("satellites:", outSatellites.map((s) => s.key).join(", "));

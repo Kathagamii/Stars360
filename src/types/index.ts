@@ -5,7 +5,7 @@ export interface GeoLocation {
   label: string; // human readable place name
 }
 
-export type ViewMode = "sky" | "constellations" | "objects";
+export type ViewMode = "sky" | "constellations" | "objects" | "satellites";
 
 export type TimeSpeed = 1 | 10 | 100 | 1000;
 
@@ -59,7 +59,18 @@ export type CelestialKind =
   | "sun"
   | "moon"
   | "deepsky"
-  | "constellation";
+  | "constellation"
+  | "satellite";
+
+/** A curated artificial Earth satellite: real orbital elements (TLE), refreshed via scripts/data:fetch + data:build. */
+export interface SatelliteRecord {
+  key: string; // stable id, joins to SATELLITE_FACTS
+  noradId: string;
+  name: string; // catalog name from the TLE
+  line1: string;
+  line2: string;
+  epoch: string; // ISO date the orbital elements were captured
+}
 
 export interface HorizontalPosition {
   altitude: number; // degrees, 0 = horizon, 90 = zenith

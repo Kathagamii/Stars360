@@ -1,6 +1,7 @@
-import type { ConstellationRecord, DeepSkyRecord, SelectedObject, StarRecord } from "../types";
+import type { ConstellationRecord, DeepSkyRecord, SatelliteRecord, SelectedObject, StarRecord } from "../types";
 import { STAR_NAMES_RU } from "../data/starNamesRu";
 import { PLANET_INFO } from "../data/planetInfo";
+import { SATELLITE_FACTS } from "../data/satelliteFacts";
 import { PLANET_BODIES } from "./engine";
 
 export interface SearchEntry {
@@ -14,7 +15,8 @@ export interface SearchEntry {
 export function buildSearchIndex(
   stars: StarRecord[],
   constellations: ConstellationRecord[],
-  deepsky: DeepSkyRecord[]
+  deepsky: DeepSkyRecord[],
+  satellites: SatelliteRecord[] = []
 ): SearchEntry[] {
   const entries: SearchEntry[] = [];
 
@@ -67,6 +69,17 @@ export function buildSearchIndex(
       title: d.altName ?? d.name,
       subtitle: `Глубокий космос · ${d.desig ?? d.id}`,
       keywords: `${d.name} ${d.altName ?? ""} ${d.desig ?? ""}`.toLowerCase(),
+    });
+  }
+
+  for (const s of satellites) {
+    const fact = SATELLITE_FACTS[s.key];
+    if (!fact) continue;
+    entries.push({
+      obj: { kind: "satellite", id: s.key },
+      title: fact.ru,
+      subtitle: `Спутник · ${s.name}`,
+      keywords: `${fact.ru} ${s.name} ${s.key}`.toLowerCase(),
     });
   }
 

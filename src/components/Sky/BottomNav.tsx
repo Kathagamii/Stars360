@@ -5,6 +5,7 @@ const TABS: { id: ViewMode; label: string; icon: string }[] = [
   { id: "sky", label: "Небо", icon: "✨" },
   { id: "constellations", label: "Созвездия", icon: "⭐" },
   { id: "objects", label: "Объекты", icon: "🪐" },
+  { id: "satellites", label: "Спутники", icon: "🛰" },
 ];
 
 export function BottomNav({ onFullscreen }: { onFullscreen: () => void }) {

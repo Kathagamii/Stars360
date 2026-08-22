@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import type * as Astronomy from "astronomy-engine";
-import type { ConstellationRecord, DeepSkyRecord, StarRecord } from "../../types";
+import type { ConstellationRecord, DeepSkyRecord, GeoLocation, SatelliteRecord, StarRecord } from "../../types";
 import { buildSearchIndex, searchObjects, type SearchEntry } from "../../astronomy/search";
 import { bodyLikeHorizontal, resolveSelected } from "../../astronomy/selection";
 import { useAppStore } from "../../store/appStore";
@@ -14,20 +14,25 @@ const KIND_ICON: Record<string, string> = {
   moon: "🌙",
   deepsky: "🌌",
   constellation: "⭐",
+  satellite: "🛰",
 };
 
 export function Search({
   stars,
   constellations,
   deepsky,
+  satellites,
   observer,
+  location,
   lookStateRef,
   onClose,
 }: {
   stars: StarRecord[];
   constellations: ConstellationRecord[];
   deepsky: DeepSkyRecord[];
+  satellites: SatelliteRecord[];
   observer: Astronomy.Observer;
+  location: GeoLocation;
   lookStateRef: React.MutableRefObject<LookState>;
   onClose: () => void;
 }) {
@@ -37,7 +42,10 @@ export function Search({
   const setViewMode = useAppStore((s) => s.setViewMode);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const index = useMemo(() => buildSearchIndex(stars, constellations, deepsky), [stars, constellations, deepsky]);
+  const index = useMemo(
+    () => buildSearchIndex(stars, constellations, deepsky, satellites),
+    [stars, constellations, deepsky, satellites]
+  );
   const results = useMemo(() => searchObjects(index, query), [index, query]);
 
   const pick = (entry: SearchEntry) => {
@@ -55,7 +63,8 @@ export function Search({
       setViewMode("constellations");
       selectConstellation(entry.constellationId);
     } else {
-      const resolved = resolveSelected(entry.obj, stars, deepsky, observer, date);
+      if (entry.obj.kind === "satellite") setViewMode("satellites");
+      const resolved = resolveSelected(entry.obj, stars, deepsky, observer, date, satellites, location);
       if (resolved) {
         alt = resolved.position.altitude;
         az = resolved.position.azimuth;
@@ -78,7 +87,7 @@ export function Search({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Sirius, Орион, Марс…"
+            placeholder="Sirius, Орион, Марс, МКС…"
             className="w-full bg-transparent text-base text-slate-100 placeholder:text-slate-500 focus:outline-none"
           />
           {query && (
@@ -117,7 +126,7 @@ export function Search({
         </ul>
         {!query && (
           <div className="mt-8 text-center text-sm text-slate-500">
-            Найдите звезду, созвездие или планету — например «Сириус», «Орион» или «Марс»
+            Найдите звезду, созвездие, планету или спутник — например «Сириус», «Орион», «Марс» или «МКС»
           </div>
         )}
       </div>

@@ -14,11 +14,13 @@ import { SkyHint } from "./SkyHint";
 import STARS from "../../data/stars.json";
 import CONSTELLATIONS from "../../data/constellations.json";
 import DEEPSKY from "../../data/deepsky.json";
-import type { ConstellationRecord, DeepSkyRecord, StarRecord } from "../../types";
+import SATELLITES from "../../data/satellites.json";
+import type { ConstellationRecord, DeepSkyRecord, SatelliteRecord, StarRecord } from "../../types";
 
 const stars = STARS as StarRecord[];
 const constellations = CONSTELLATIONS as ConstellationRecord[];
 const deepsky = DEEPSKY as DeepSkyRecord[];
+const satellites = SATELLITES as SatelliteRecord[];
 
 export function SkyScreen() {
   const location = useAppStore((s) => s.location);
@@ -105,7 +107,7 @@ export function SkyScreen() {
       <SkyHint />
       <ErrorBanner />
 
-      <ObjectInfoPanel stars={stars} deepsky={deepsky} observer={observer} />
+      <ObjectInfoPanel stars={stars} deepsky={deepsky} satellites={satellites} observer={observer} location={location} />
       <ConstellationInfoPanel constellations={constellations} stars={stars} deepsky={deepsky} />
 
       {timePanelOpen && <TimeController onClose={() => setTimePanelOpen(false)} />}
@@ -114,7 +116,9 @@ export function SkyScreen() {
           stars={stars}
           constellations={constellations}
           deepsky={deepsky}
+          satellites={satellites}
           observer={observer}
+          location={location}
           lookStateRef={lookStateRef}
           onClose={() => setSearchOpen(false)}
         />

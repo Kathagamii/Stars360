@@ -1,7 +1,9 @@
 import * as Astronomy from "astronomy-engine";
-import type { DeepSkyRecord, HorizontalPosition, SelectedObject, StarRecord } from "../types";
+import type { DeepSkyRecord, GeoLocation, HorizontalPosition, SatelliteRecord, SelectedObject, StarRecord } from "../types";
 import { getBodyPosition, getMoonInfo, type PlanetName } from "./engine";
 import { PLANET_INFO } from "../data/planetInfo";
+import { SATELLITE_FACTS } from "../data/satelliteFacts";
+import { createSatRec, isNakedEyeVisible, propagateSatellite, satelliteOrbitStats } from "./satellites";
 import { DEEPSKY_TYPE_LABELS } from "../types";
 import { cleanSpectralClass, formatDistance, formatMagnitude } from "../utils/format";
 
@@ -19,7 +21,9 @@ export function resolveSelected(
   stars: StarRecord[],
   deepsky: DeepSkyRecord[],
   observer: Astronomy.Observer,
-  date: Date
+  date: Date,
+  satellites: SatelliteRecord[] = [],
+  location?: GeoLocation
 ): ResolvedObject | null {
   if (selected.kind === "star") {
     const hip = Number(selected.id.replace("hip-", ""));
@@ -111,6 +115,38 @@ export function resolveSelected(
       rows: [
         { label: "Расстояние от Земли", value: `${pos.distanceAU.toFixed(3)} а.е.` },
         { label: "Экваториальный радиус", value: `${info.radiusKm.toLocaleString("ru-RU")} км` },
+      ],
+    };
+  }
+
+  if (selected.kind === "satellite" && location) {
+    const sat = satellites.find((s) => s.key === selected.id);
+    const fact = sat ? SATELLITE_FACTS[sat.key] : undefined;
+    if (!sat || !fact) return null;
+    const satrec = createSatRec(sat.line1, sat.line2);
+    const pos = propagateSatellite(satrec, date, location);
+    if (!pos) return null;
+    const orbit = satelliteOrbitStats(satrec);
+    const sunAlt = getBodyPosition(Astronomy.Body.Sun, date, observer).altitude;
+    const visibleNow = isNakedEyeVisible(pos, sunAlt);
+    return {
+      kind: "satellite",
+      title: fact.ru,
+      subtitle: `${fact.category} · ${sat.name}`,
+      position: pos,
+      rows: [
+        { label: "Оператор", value: fact.operator },
+        { label: "Запуск", value: fact.launch },
+        { label: "Тип орбиты", value: fact.orbitType },
+        { label: "Расстояние сейчас", value: `${Math.round(pos.rangeKm).toLocaleString("ru-RU")} км` },
+        { label: "Высота орбиты сейчас", value: `${Math.round(pos.heightKm).toLocaleString("ru-RU")} км` },
+        { label: "Скорость", value: `${pos.velocityKmS.toFixed(2)} км/с` },
+        { label: "Период обращения", value: `${orbit.periodMinutes.toFixed(1)} мин` },
+        { label: "Наклонение орбиты", value: `${orbit.inclinationDeg.toFixed(1)}°` },
+        {
+          label: "Видим сейчас невооружённым глазом",
+          value: visibleNow ? "да" : pos.visible && !pos.sunlit ? "нет (в тени Земли)" : "нет",
+        },
       ],
     };
   }

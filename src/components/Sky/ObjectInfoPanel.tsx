@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type * as Astronomy from "astronomy-engine";
-import type { DeepSkyRecord, StarRecord } from "../../types";
+import type { DeepSkyRecord, GeoLocation, SatelliteRecord, StarRecord } from "../../types";
 import { useAppStore } from "../../store/appStore";
 import { useSimTime } from "../../hooks/useSimTime";
 import { resolveSelected } from "../../astronomy/selection";
@@ -13,16 +13,21 @@ const KIND_ICON: Record<string, string> = {
   sun: "☀️",
   moon: "🌙",
   deepsky: "🌌",
+  satellite: "🛰",
 };
 
 export function ObjectInfoPanel({
   stars,
   deepsky,
+  satellites,
   observer,
+  location,
 }: {
   stars: StarRecord[];
   deepsky: DeepSkyRecord[];
+  satellites: SatelliteRecord[];
   observer: Astronomy.Observer;
+  location: GeoLocation;
 }) {
   const selected = useAppStore((s) => s.selected);
   const select = useAppStore((s) => s.select);
@@ -30,8 +35,8 @@ export function ObjectInfoPanel({
 
   const resolved = useMemo(() => {
     if (!selected) return null;
-    return resolveSelected(selected, stars, deepsky, observer, time);
-  }, [selected, stars, deepsky, observer, time]);
+    return resolveSelected(selected, stars, deepsky, observer, time, satellites, location);
+  }, [selected, stars, deepsky, observer, time, satellites, location]);
 
   if (!selected || !resolved) return null;
 
@@ -110,6 +115,8 @@ function kindLabel(kind: string): string {
       return "Спутник Земли";
     case "deepsky":
       return "Глубокий космос";
+    case "satellite":
+      return "Искусственный спутник";
     default:
       return "";
   }

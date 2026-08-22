@@ -8,6 +8,12 @@
 //  - HYG Database (astronexus, CC-BY-SA/public-domain-ish, see its own
 //    LICENSE): adds real distance (parsecs) and spectral class per star
 //    by Hipparcos number. https://github.com/astronexus/HYG-Database
+//  - CelesTrak (public domain GP/TLE element sets): current orbital
+//    elements for a curated set of well-known satellites, used to
+//    propagate real-time positions with SGP4. https://celestrak.org
+//    NOTE: orbital elements go stale after 1-2 weeks (atmospheric drag,
+//    orbit maintenance burns). Re-run this + build-data.mjs periodically
+//    to refresh src/data/satellites.json.
 
 import { writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -19,6 +25,7 @@ mkdirSync(dp, { recursive: true });
 
 const CELESTIAL = "https://raw.githubusercontent.com/ofrohn/d3-celestial/master";
 const HYG = "https://raw.githubusercontent.com/astronexus/HYG-Database/master/hyg/CURRENT";
+const CELESTRAK = "https://celestrak.org/NORAD/elements/gp.php";
 
 const files = [
   [`${CELESTIAL}/data/stars.6.json`, "stars.6.json"],
@@ -30,6 +37,16 @@ const files = [
   [`${CELESTIAL}/LICENSE`, "LICENSE_d3celestial.txt"],
   [`${HYG}/hygdata_v41.csv`, "hygdata_v41.csv"],
   [`${HYG}/LICENSE`, "LICENSE_hyg.txt"],
+  // Small satellite groups the curated list in build-data.mjs picks specific
+  // named objects out of (kept small/targeted to avoid CelesTrak's
+  // per-group rate limit on repeated large downloads).
+  [`${CELESTRAK}?GROUP=stations&FORMAT=tle`, "sat-stations.tle"],
+  [`${CELESTRAK}?GROUP=science&FORMAT=tle`, "sat-science.tle"],
+  [`${CELESTRAK}?GROUP=gps-ops&FORMAT=tle`, "sat-gps-ops.tle"],
+  [`${CELESTRAK}?GROUP=geo&FORMAT=tle`, "sat-geo.tle"],
+  [`${CELESTRAK}?GROUP=weather&FORMAT=tle`, "sat-weather.tle"],
+  [`${CELESTRAK}?GROUP=resource&FORMAT=tle`, "sat-resource.tle"],
+  [`${CELESTRAK}?GROUP=oneweb&FORMAT=tle`, "sat-oneweb.tle"],
 ];
 
 for (const [url, name] of files) {

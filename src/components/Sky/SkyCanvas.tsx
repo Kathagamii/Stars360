@@ -13,15 +13,18 @@ import { StarField } from "./StarField";
 import { ConstellationLines } from "./ConstellationLines";
 import { DeepSkyObjects } from "./DeepSkyObjects";
 import { CelestialBodies } from "./CelestialBodies";
+import { Satellites } from "./Satellites";
 import { getSkyPalette } from "./skyPalette";
 import STARS from "../../data/stars.json";
 import CONSTELLATIONS from "../../data/constellations.json";
 import DEEPSKY from "../../data/deepsky.json";
-import type { ConstellationRecord, SelectedObject } from "../../types";
+import SATELLITES from "../../data/satellites.json";
+import type { ConstellationRecord, SatelliteRecord, SelectedObject } from "../../types";
 
 const stars = STARS as StarRecord[];
 const constellations = CONSTELLATIONS as ConstellationRecord[];
 const deepsky = DEEPSKY as DeepSkyRecord[];
+const satellites = SATELLITES as SatelliteRecord[];
 
 export interface SkyCanvasHandle {
   lookState: ReturnType<typeof createLookState>;
@@ -42,7 +45,7 @@ export function SkyCanvas({
   lookStateRef,
 }: {
   location: GeoLocation;
-  viewMode: "sky" | "constellations" | "objects";
+  viewMode: "sky" | "constellations" | "objects" | "satellites";
   showConstellationLines: boolean;
   showTerrain: boolean;
   selectedConstellationId: string | null;
@@ -60,6 +63,7 @@ export function SkyCanvas({
 
   const showConstellations = viewMode === "constellations";
   const showDeepSky = viewMode === "objects";
+  const showSatellites = viewMode === "satellites";
 
   return (
     <Canvas
@@ -97,6 +101,13 @@ export function SkyCanvas({
         observer={observer}
         paletteRef={paletteRef}
         sunDirRef={sunDirRef}
+        onHover={onHoverLabel}
+        onSelect={onSelectObject}
+      />
+      <Satellites
+        satellites={satellites}
+        location={location}
+        visible={showSatellites}
         onHover={onHoverLabel}
         onSelect={onSelectObject}
       />
