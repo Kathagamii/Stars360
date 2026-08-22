@@ -24,6 +24,9 @@ interface AppState {
   showConstellationLines: boolean;
   toggleConstellationLines: () => void;
 
+  showTerrain: boolean;
+  toggleTerrain: () => void;
+
   selected: SelectedObject | null;
   select: (obj: SelectedObject | null) => void;
 
@@ -71,6 +74,9 @@ export const useAppStore = create<AppState>((set) => ({
 
   showConstellationLines: true,
   toggleConstellationLines: () => set((s) => ({ showConstellationLines: !s.showConstellationLines })),
+
+  showTerrain: true,
+  toggleTerrain: () => set((s) => ({ showTerrain: !s.showTerrain })),
 
   selected: null,
   select: (obj) => set({ selected: obj, selectedConstellationId: null }),

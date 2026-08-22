@@ -12,18 +12,30 @@ export function BottomNav({ onFullscreen }: { onFullscreen: () => void }) {
   const setViewMode = useAppStore((s) => s.setViewMode);
   const showLines = useAppStore((s) => s.showConstellationLines);
   const toggleLines = useAppStore((s) => s.toggleConstellationLines);
+  const showTerrain = useAppStore((s) => s.showTerrain);
+  const toggleTerrain = useAppStore((s) => s.toggleTerrain);
 
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[200] flex flex-col items-center gap-2 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4">
-      {viewMode === "constellations" && (
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        {viewMode === "constellations" && (
+          <button
+            onClick={toggleLines}
+            className="glass pointer-events-auto flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-slate-200 shadow-lg transition hover:bg-white/10"
+          >
+            <span className={`h-2 w-2 rounded-full ${showLines ? "bg-accent-400" : "bg-slate-600"}`} />
+            Линии созвездий {showLines ? "включены" : "выключены"}
+          </button>
+        )}
         <button
-          onClick={toggleLines}
+          onClick={toggleTerrain}
           className="glass pointer-events-auto flex items-center gap-2 rounded-full px-4 py-2 text-xs font-medium text-slate-200 shadow-lg transition hover:bg-white/10"
+          aria-label="Переключить рельеф горизонта"
         >
-          <span className={`h-2 w-2 rounded-full ${showLines ? "bg-accent-400" : "bg-slate-600"}`} />
-          Линии созвездий {showLines ? "включены" : "выключены"}
+          <span className={`h-2 w-2 rounded-full ${showTerrain ? "bg-accent-400" : "bg-slate-600"}`} />
+          🏔 Рельеф {showTerrain ? "включён" : "выключен"}
         </button>
-      )}
+      </div>
 
       <div className="glass-strong pointer-events-auto flex items-center gap-1 rounded-full p-1.5 shadow-2xl">
         {TABS.map((tab) => (

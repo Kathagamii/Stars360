@@ -8,6 +8,7 @@ import { LookControls, createLookState } from "./LookControls";
 import { Ticker } from "./Ticker";
 import { SkyDome } from "./SkyDome";
 import { HorizonGround } from "./HorizonGround";
+import { Terrain } from "./Terrain";
 import { StarField } from "./StarField";
 import { ConstellationLines } from "./ConstellationLines";
 import { DeepSkyObjects } from "./DeepSkyObjects";
@@ -30,6 +31,7 @@ export function SkyCanvas({
   location,
   viewMode,
   showConstellationLines,
+  showTerrain,
   selectedConstellationId,
   onHoverLabel,
   onSelectStar,
@@ -42,6 +44,7 @@ export function SkyCanvas({
   location: GeoLocation;
   viewMode: "sky" | "constellations" | "objects";
   showConstellationLines: boolean;
+  showTerrain: boolean;
   selectedConstellationId: string | null;
   onHoverLabel: (label: string | null) => void;
   onSelectStar: (star: StarRecord) => void;
@@ -69,6 +72,9 @@ export function SkyCanvas({
       <Ticker />
       <SkyDome paletteRef={paletteRef} sunDirRef={sunDirRef} onBackgroundClick={onClearSelection} />
       <HorizonGround paletteRef={paletteRef} onBackgroundClick={onClearSelection} />
+      {showTerrain && (
+        <Terrain lat={location.lat} lon={location.lon} paletteRef={paletteRef} onBackgroundClick={onClearSelection} />
+      )}
       <StarField stars={stars} observer={observer} paletteRef={paletteRef} onHover={(s) => onHoverLabel(s ? starLabel(s) : null)} onSelect={onSelectStar} />
       <ConstellationLines
         constellations={constellations}

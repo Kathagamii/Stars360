@@ -25,6 +25,7 @@ export function SkyScreen() {
   const backToMap = useAppStore((s) => s.backToMap);
   const viewMode = useAppStore((s) => s.viewMode);
   const showConstellationLines = useAppStore((s) => s.showConstellationLines);
+  const showTerrain = useAppStore((s) => s.showTerrain);
   const selectedConstellationId = useAppStore((s) => s.selectedConstellationId);
   const select = useAppStore((s) => s.select);
   const selectConstellation = useAppStore((s) => s.selectConstellation);
@@ -75,6 +76,7 @@ export function SkyScreen() {
         location={location}
         viewMode={viewMode}
         showConstellationLines={showConstellationLines}
+        showTerrain={showTerrain}
         selectedConstellationId={selectedConstellationId}
         lookStateRef={lookStateRef}
         onHoverLabel={setHoverLabel}

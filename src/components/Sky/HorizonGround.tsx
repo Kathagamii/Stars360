@@ -48,6 +48,7 @@ export function HorizonGround({
       });
       const [x, y, z] = horizontalToVector3(1.5, az, DOME_RADIUS * 0.97);
       sprite.position.set(x, y, z);
+      sprite.renderOrder = 10;
       return sprite;
     });
   }, []);
