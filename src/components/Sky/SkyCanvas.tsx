@@ -19,7 +19,7 @@ import STARS from "../../data/stars.json";
 import CONSTELLATIONS from "../../data/constellations.json";
 import DEEPSKY from "../../data/deepsky.json";
 import SATELLITES from "../../data/satellites.json";
-import type { ConstellationRecord, SatelliteRecord, SelectedObject } from "../../types";
+import type { ConstellationRecord, SatelliteBearing, SatelliteRecord, SelectedObject } from "../../types";
 
 const stars = STARS as StarRecord[];
 const constellations = CONSTELLATIONS as ConstellationRecord[];
@@ -42,6 +42,7 @@ export function SkyCanvas({
   onSelectObject,
   onSelectConstellation,
   onClearSelection,
+  onSatelliteBearings,
   lookStateRef,
 }: {
   location: GeoLocation;
@@ -55,6 +56,7 @@ export function SkyCanvas({
   onSelectObject: (obj: SelectedObject) => void;
   onSelectConstellation: (id: string) => void;
   onClearSelection: () => void;
+  onSatelliteBearings?: (bearings: SatelliteBearing[]) => void;
   lookStateRef: React.MutableRefObject<ReturnType<typeof createLookState>>;
 }) {
   const observer = useMemo<Astronomy.Observer>(() => makeObserver(location), [location]);
@@ -110,6 +112,7 @@ export function SkyCanvas({
         visible={showSatellites}
         onHover={onHoverLabel}
         onSelect={onSelectObject}
+        onBearings={onSatelliteBearings}
       />
     </Canvas>
   );

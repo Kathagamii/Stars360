@@ -145,7 +145,9 @@ src/
                        LookControls (вращение обзора),
                        Ticker (симуляционные часы внутри Canvas)
                    TopBar, BottomNav, ObjectInfoPanel,
-                   ConstellationInfoPanel, TimeController, Search
+                   ConstellationInfoPanel, TimeController, Search,
+                   SatelliteBearings (подсказки-стрелки к спутникам,
+                   находящимся вне текущего поля зрения)
 ```
 
 ## Производительность

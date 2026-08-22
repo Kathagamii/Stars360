@@ -9,13 +9,14 @@ import { ObjectInfoPanel } from "./ObjectInfoPanel";
 import { ConstellationInfoPanel } from "./ConstellationInfoPanel";
 import { TimeController } from "./TimeController";
 import { Search } from "./Search";
+import { SatelliteBearings } from "./SatelliteBearings";
 import { ErrorBanner } from "../ErrorBanner";
 import { SkyHint } from "./SkyHint";
 import STARS from "../../data/stars.json";
 import CONSTELLATIONS from "../../data/constellations.json";
 import DEEPSKY from "../../data/deepsky.json";
 import SATELLITES from "../../data/satellites.json";
-import type { ConstellationRecord, DeepSkyRecord, SatelliteRecord, StarRecord } from "../../types";
+import type { ConstellationRecord, DeepSkyRecord, SatelliteBearing, SatelliteRecord, StarRecord } from "../../types";
 
 const stars = STARS as StarRecord[];
 const constellations = CONSTELLATIONS as ConstellationRecord[];
@@ -39,6 +40,7 @@ export function SkyScreen() {
 
   const [hoverLabel, setHoverLabel] = useState<string | null>(null);
   const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
+  const [satelliteBearings, setSatelliteBearings] = useState<SatelliteBearing[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const lookStateRef = useRef(createLookState());
 
@@ -90,7 +92,20 @@ export function SkyScreen() {
           select(null);
           selectConstellation(null);
         }}
+        onSatelliteBearings={setSatelliteBearings}
       />
+
+      {viewMode === "satellites" && (
+        <SatelliteBearings
+          bearings={satelliteBearings}
+          lookStateRef={lookStateRef}
+          onFocus={(b) => {
+            lookStateRef.current.az = b.azimuth;
+            lookStateRef.current.alt = Math.max(b.altitude, 4);
+            select({ kind: "satellite", id: b.key });
+          }}
+        />
+      )}
 
       <TopBar onOpenTime={() => setTimePanelOpen(true)} onOpenSearch={() => setSearchOpen(true)} />
       <BottomNav onFullscreen={toggleFullscreen} />

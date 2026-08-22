@@ -72,6 +72,14 @@ export interface SatelliteRecord {
   epoch: string; // ISO date the orbital elements were captured
 }
 
+/** A satellite's current live alt/az, reported up from the 3D scene for the off-screen bearing indicators. */
+export interface SatelliteBearing {
+  key: string;
+  name: string;
+  azimuth: number;
+  altitude: number;
+}
+
 export interface HorizontalPosition {
   altitude: number; // degrees, 0 = horizon, 90 = zenith
   azimuth: number; // degrees, 0 = N, 90 = E, 180 = S, 270 = W
