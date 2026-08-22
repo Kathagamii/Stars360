@@ -65,7 +65,7 @@ export function HorizonGround({
   useFrame(() => {
     const p = paletteRef.current;
     if (groundMatRef.current) {
-      groundMatRef.current.color.copy(p.horizon).multiplyScalar(0.05).offsetHSL(0, -0.1, -0.03);
+      groundMatRef.current.color.copy(p.horizon).multiplyScalar(0.16).offsetHSL(-0.16, 0.3, -0.02);
     }
     if (ringRef.current) {
       ringRef.current.color.copy(p.horizon).lerp(new THREE.Color(0xffffff), 0.15);
@@ -76,7 +76,7 @@ export function HorizonGround({
     <group>
       <mesh rotation={[0, 0, 0]} renderOrder={-5} onClick={onBackgroundClick}>
         <sphereGeometry args={[DOME_RADIUS * 1.05, 48, 24, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2]} />
-        <meshBasicMaterial ref={groundMatRef} color={0x03040a} side={THREE.BackSide} depthWrite={false} toneMapped={false} />
+        <meshBasicMaterial ref={groundMatRef} color={0x03040a} side={THREE.BackSide} depthWrite={false} />
       </mesh>
       <lineLoop renderOrder={-4}>
         <primitive object={ringGeometry} attach="geometry" />
